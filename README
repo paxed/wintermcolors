@@ -1,0 +1,11 @@
+wintermcolors - Windows Console (and PuTTY) colors editor
+
+A simple javascript and PHP web page for changing
+the Windows Console or PuTTY colors. Edit the colors
+(or choose from several predefined palettes), and
+download a Windows registry file.
+
+
+-- 
+Pasi Kallinen
+paxed@alt.org
