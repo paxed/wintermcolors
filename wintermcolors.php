@@ -24,6 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     for ($x = 0; $x < 16; $x++) {
       $str .= sprintf("\"ColorTable%02d\"=dword:00%06s", $x, $_POST['col'.$x])."\r\n";
     }
+    $str .= "\r\n";
+
     $filename = "win_console_colors.reg";
     break;
   case 1:
@@ -37,11 +39,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       $b = hexdec(substr($_POST['col'.$x], 4, 2));
       $str .= sprintf("\"Colour%d\"=\"%d,%d,%d\"", $putty_reorder[$x], $r,$g,$b)."\r\n";
     }
+    $str .= "\r\n";
+
     $filename = "putty_colors.reg";
     break;
+  case 2:
+      $str = "#!/bin/sh\n";
+      for ($x = 0; $x < 16; $x++) {
+	  $str .= sprintf("echo -e '\\e]P%x%06s'", $x, strtolower($_POST['col'.$x]))."\n";
+      }
+      $filename = "linux_terminal_colors.sh";
+      break;
   }
-
-  $str .= "\r\n";
 
   header('Content-Type: binary/octet-stream');
   header('Content-Length: '.strlen($str));
@@ -68,8 +77,9 @@ var default_regtype = <?php echo $def_regtype; ?>;
 var default_colorset = <?php echo $def_colorset; ?>;
 
 var regtypes = new Array(
- {'name':"Current user", 'regtype':0},
- {'name':"PuTTY", 'regtype':1}
+ {'name':"Windows cmdline (Current user)", 'regtype':0},
+ {'name':"PuTTY", 'regtype':1},
+ {'name':"Linux terminal (sh script)", 'regtype':2}
 );
 
 var colors = new Array(
