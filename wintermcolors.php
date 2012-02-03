@@ -50,6 +50,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       }
       $filename = "linux_terminal_colors.sh";
       break;
+  case 3:
+      $str = "! Save this file as ~/.Xdefaults and use \"xrdb -merge ~/.Xdefaults\" to active the changes.\n";
+      for ($x = 0; $x < 16; $x++) {
+	  $str .= sprintf("XTerm*color%d: #%06s", $x, strtolower($_POST['col'.$x]))."\n";
+      }
+      $filename = "xterm_xdefaults.txt";
+      break;
+  case 4:
+      $str = "! Save this file as ~/.Xdefaults and use \"xrdb -merge ~/.Xdefaults\" to active the changes.\n";
+      for ($x = 0; $x < 16; $x++) {
+	  $str .= sprintf("Rxvt*color%d: #%06s", $x, strtolower($_POST['col'.$x]))."\n";
+      }
+      $filename = "rxvt_xdefaults.txt";
+      break;
+
   }
 
   header('Content-Type: binary/octet-stream');
@@ -68,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<title>Windows Console colors editor</title>
+<title>Console colors editor</title>
 <script type="text/javascript">
 <!--
 var colortable = new Array();
@@ -77,9 +92,11 @@ var default_regtype = <?php echo $def_regtype; ?>;
 var default_colorset = <?php echo $def_colorset; ?>;
 
 var regtypes = new Array(
- {'name':"Windows cmdline (Current user)", 'regtype':0},
- {'name':"PuTTY", 'regtype':1},
- {'name':"Linux terminal (sh script)", 'regtype':2}
+ {'name':"Windows cmdline, current user (registry file)", 'regtype':0},
+ {'name':"PuTTY (registry file)", 'regtype':1},
+ {'name':"Linux terminal (sh script)", 'regtype':2},
+ {'name':"xterm (X11 resource file)", 'regtype':3},
+ {'name':"rxvt (X11 resource file)", 'regtype':4}
 );
 
 var colors = new Array(
@@ -486,7 +503,7 @@ function setcolordiv_content()
   }
   txt += "<\/ul>";
 
-  txt += "Create registry file for:";
+  txt += "Create a file for:";
   txt += get_regtype_input();
 
   tmp.innerHTML = txt;
@@ -496,19 +513,15 @@ function setcolordiv_content()
 </head>
 <body>
 
-<h1>Windows Console colors editor</h1>
+<h1>Console colors editor</h1>
 
 <div>
 If you are having problems because the blue is too dark,
 or the brown is too gray, or you hate the orange(bright-red),
-then you probably want to tweak Windows' color settings for consoles.
+then you probably want to tweak the color settings for your text console.
 <p>
 Edit the colors below (or click on a predefined settings)
-and press the Download-button. You will get a windows registry file
-that you can merge into your registry by double clicking on it.
-<p>
-After that, all console applications will use those colors
-when in a windowed mode.
+and press the Download-button.
 </div>
 
 <form method='post' action='<?php echo $_SERVER['PHP_SELF'] ?>'>
