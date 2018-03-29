@@ -90,6 +90,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <html>
 <head>
 <title>Console colors editor</title>
+<style>
+      td.colorname { text-align: right; padding-right: 0.25em; }
+      #editdiv { float: left; padding: 1em; margin-right: 2em; }
+      #presetsdiv { padding: 1em; }
+</style>
 <script type="text/javascript">
 <!--
 var colortable = new Array();
@@ -104,6 +109,26 @@ var regtypes = new Array(
  {'name':"xterm (X11 resource file)", 'regtype':3},
  {'name':"rxvt (X11 resource file)", 'regtype':4}
 );
+
+var colornames = new Array(
+          "black",
+          "red",
+          "green",
+          "brown",
+          "blue",
+          "magenta",
+          "cyan",
+          "light gray",
+
+          "dark gray",
+          "light red",
+          "light green",
+          "yellow",
+          "light blue",
+          "light magenta",
+          "light cyan",
+          "white"
+      );
 
 var colors = new Array(
  {'name':"Default Windows console colors",
@@ -408,10 +433,8 @@ function get_regtype_input()
 
 function recalc_color(colnum)
 {
-  var tmp = document.getElementById("colexample"+colnum.toString());
   var val = document.getElementById("col"+colnum.toString());
 
-  if (!tmp) return;
   if (!val) return;
 
   if (val.value.match('[^0-9a-fA-F]')) {
@@ -428,8 +451,6 @@ function recalc_color(colnum)
     }
   }
 
-  tmp.style.background = "#" + val.value;
-
   write_sample();
 }
 
@@ -441,12 +462,16 @@ function draw_colorinput()
 
   if (!tmp) return;
 
+  txt += "<table>";
   for (x = 0; x < 16; x++) {
-    txt += "<input type='color' value='#"+colortable[x]+"' id='col"+x+"' name='col"+x+"'>";
-    txt += "<br>";
+      txt += "<tr>";
+      txt += "<td class='colorname'>" + colornames[x] + "</td>";
+      txt += "<td><input type='color' value='#"+colortable[x]+"' id='col"+x+"' name='col"+x+"' onchange='write_sample()'></td>";
+      txt += "</tr>";
   }
+  txt += "</table>";
 
-  txt += "<p><input type='Submit' value='Download'>";
+  txt += "<input type='Submit' value='Download'>";
 
   tmp.innerHTML = txt;
 }
@@ -554,8 +579,8 @@ and press the Download-button.
 
 <form method='post' action='<?php echo $_SERVER['PHP_SELF'] ?>'>
 
-<div style="float:left;padding:1em;margin-right:2em" id="editdiv"></div>
-<div style="padding:1em" id="presetsdiv"></div>
+<div id="editdiv"></div>
+<div id="presetsdiv"></div>
 <div id="samplediv"></div>
 
 </form>
