@@ -17,6 +17,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
   $str = "REGEDIT4\r\n\r\n";
 
+  for ($i = 0; $i < 16; $i++) {
+      if (!isset($_POST['col'.$i])) die("Color $i not set.");
+      if (!preg_match('/^#[0-9a-fA-F]{6}$/', $_POST['col'.$i])) die("Color $i not a hex color.");
+      $_POST['col'.$i] = preg_replace('/^#(.+)$/', '$1', $_POST['col'.$i]);
+  }
+
   switch ($_POST['regtype']) {
   default:
   case 0:
@@ -400,19 +406,6 @@ function get_regtype_input()
   return ret;
 }
 
-function get_color_input(colnum, col)
-{
-  var ret = "";
-  ret += "<input style='font-family:monospace;'";
-  ret += " onchange='recalc_color("+colnum.toString()+");'";
-  ret += " onblur='recalc_color("+colnum.toString()+");'";
-  ret += " type='text' id='col" + colnum.toString() + "'";
-  ret += " name='col" + colnum.toString() + "'";
-  ret += " size='6' maxlength='6' value='" + col + "'>";
-  return ret;
-}
-
-
 function recalc_color(colnum)
 {
   var tmp = document.getElementById("colexample"+colnum.toString());
@@ -449,13 +442,8 @@ function draw_colorinput()
   if (!tmp) return;
 
   for (x = 0; x < 16; x++) {
-    txt += "<span>";
-    txt += get_color_input(x, colortable[x]);
-    txt += "&nbsp;";
-    txt += "<a href='#' onclick='write_colorpicker("+x+"); return false;' style='text-decoration:none;font-family:monospace;border:.25em solid black;background:#"+colortable[x]+";' id='colexample"+x+"'>";
-    txt += "&nbsp;&nbsp;";
-    txt += "<\/a>";
-    txt += "<\/span><br>";
+    txt += "<input type='color' value='#"+colortable[x]+"' id='col"+x+"' name='col"+x+"'>";
+    txt += "<br>";
   }
 
   txt += "<p><input type='Submit' value='Download'>";
@@ -481,7 +469,6 @@ function set_all_colors(num)
     }
     tmp.style.background='lightgrey';
     previous_pre = num;
-    colorpicker_close();
     write_sample();
   }
 }
@@ -505,100 +492,10 @@ function rgb2hex(r,g,b)
   return txt;
 }
 
-function set_picked_color(coloridx, r,g,b)
-{
-  var tmp = document.getElementById("colorpickerspan");
-  var val = document.getElementById("col"+coloridx.toString());
-  if (!tmp) return;
-  if (!val) return;
-
-  tmp.innerHTML = "";
-
-  val.value = rgb2hex(r,g,b);
-
-  tmp = document.getElementById("colexample"+coloridx.toString());
-  if (!tmp) return;
-  tmp.style.background = "#" + val.value;
-  write_sample();
-}
-
-function set_picker_example(r,g,b)
-{
-  var tmp = document.getElementById("colorpicker_example");
-  if (!tmp) return;
-  tmp.innerHTML = rgb2hex(r,g,b);
-  tmp.style.background = "#" + rgb2hex(r,g,b);
-  if ((r < 120) && (g < 120) && (b < 120)) {
-    tmp.style.color = "white";
-  } else {
-    tmp.style.color = "black";
-  }
-}
-
-function colorpicker_close()
-{
-  var tmp = document.getElementById("colorpickerspan");
-  if (tmp == undefined) return;
-  tmp.innerHTML = "";
-}
-
-function write_colorpicker(coloridx)
-{
-  var tmp = document.getElementById("colorpickerspan");
-  var origcolor = document.getElementById("col"+coloridx.toString());
-
-  if (tmp == undefined) return;
-
-  var txt = "";
-  var i,r,g,b;
-
-  orig_r = parseInt(origcolor.value[0],16)*16 + parseInt(origcolor.value[1], 16);
-  orig_g = parseInt(origcolor.value[2],16)*16 + parseInt(origcolor.value[3], 16);
-  orig_b = parseInt(origcolor.value[4],16)*16 + parseInt(origcolor.value[5], 16);
-
-  txt += "<p><span style='font-family:monospace' id='colorpicker_example'>000000</span>&nbsp;-&nbsp;";
-  txt += "<span style='font-family:monospace;background-color:#"+origcolor.value+"'>"+origcolor.value+"</span>";
-
-  txt += "<br>";
-
-  for (i = 0; i < 256; i += 8) {
-    r = Math.floor(orig_r*(i/256));
-    g = Math.floor(orig_g*(i/256));
-    b = Math.floor(orig_b*(i/256));
-    txt += "<a href='#' onMouseOver='set_picker_example("+r+","+g+","+b+");' onclick='set_picked_color("+coloridx+","+r+","+g+","+b+");' style='background-color:rgb("+r+","+g+","+b+");text-decoration:none;'>&nbsp;</a>";
-  }
-
-  txt += "<br><br>";
-
-  for (i = 0; i < 256; i += 8) {
-    r = i;
-    g = orig_g;
-    b = orig_b;
-    txt += "<a href='#' onMouseOver='set_picker_example("+r+","+g+","+b+");' onclick='set_picked_color("+coloridx+","+r+","+g+","+b+");' style='background-color:rgb("+r+","+g+","+b+");text-decoration:none;'>&nbsp;</a>";
-  }
-
-  txt += "<br>";
-  for (i = 0; i < 256; i += 8) {
-    r = orig_r;
-    g = i;
-    b = orig_b;
-    txt += "<a href='#' onMouseOver='set_picker_example("+r+","+g+","+b+");' onclick='set_picked_color("+coloridx+","+r+","+g+","+b+");' style='background-color:rgb("+r+","+g+","+b+");text-decoration:none;'>&nbsp;</a>";
-  }
-  txt += "<br>";
-  for (i = 0; i < 256; i += 8) {
-    r = orig_r;
-    g = orig_g;
-    b = i;
-    txt += "<a href='#' onMouseOver='set_picker_example("+r+","+g+","+b+");' onclick='set_picked_color("+coloridx+","+r+","+g+","+b+");' style='background-color:rgb("+r+","+g+","+b+");text-decoration:none;'>&nbsp;</a>";
-  }
-
-  tmp.innerHTML = txt;
-}
-
 function write_sample()
 {
   var tmp = document.getElementById("samplediv");
-  var txt = 'Sample:<br><span style="font-family:monospace;background-color:black;">';
+  var txt = 'Sample:<br><span style="font-family:monospace;background-color:black;font-size:large">';
   var i, r;
 
   txt += "&nbsp;";
@@ -608,7 +505,7 @@ function write_sample()
   for (i = 0; i < 16; i++) {
     var chr = '@'; //String.fromCharCode(Math.floor((Math.random() * ('~'.charCodeAt(0) - ' '.charCodeAt(0)+1)) + ' '.charCodeAt(0)));
     var origcolor = document.getElementById("col"+i.toString());
-    txt += "&nbsp;<span style='color:#"+origcolor.value+"'>" + chr + "</span>&nbsp;";
+    txt += "&nbsp;<span style='color:"+origcolor.value+"'>" + chr + "</span>&nbsp;";
   }
   txt += "&nbsp;<br>&nbsp;";
   for (i = 0; i < 16; i++) { txt += "&nbsp;&nbsp;&nbsp;"; }
@@ -660,7 +557,6 @@ and press the Download-button.
 <div style="float:left;padding:1em;margin-right:2em" id="editdiv"></div>
 <div style="padding:1em" id="presetsdiv"></div>
 <div id="samplediv"></div>
-<div style="font-family:monospace;" id="colorpickerspan"></div>
 
 </form>
 
