@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   case 2:
       $str = "#!/bin/sh\n";
       for ($x = 0; $x < 16; $x++) {
-	  $str .= sprintf("echo -e '\\e]P%x%06s'", $x, strtolower($_POST['col'.$x]))."\n";
+          $str .= sprintf("echo -e '\\e]4;%d;#%06s\\e\\\\'\n", $x, strtolower($_POST['col'.$x]));
       }
       $filename = "linux_terminal_colors.sh";
       break;
@@ -388,6 +388,23 @@ var colors = new Array(
                          "ff81ae",
                          "74dbe6",
                          "f2f8f8")},
+ {'name':'Terrarian_51', /* https://www.reddit.com/r/nethack/comments/kamrsp/no_more_pain_while_reading_symbols_here_comes_a/ */
+         'pal':new Array("1e1e1e",
+                         "be0000",
+                         "00aa00",
+                         "bea000",
+                         "004bb4",
+                         "a000be",
+                         "00aa8c",
+                         "bebea0",
+                         "828296",
+                         "e15a00",
+                         "5ae100",
+                         "e1e100",
+                         "0078e1",
+                         "e100e1",
+                         "00e1e1",
+                         "ebebeb")},
  {'name':'Zenburn',
          'pal':new Array("3f3f3f",
                          "af6464",
